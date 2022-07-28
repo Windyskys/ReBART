@@ -16,22 +16,23 @@ def init_model(model_name: str, device, do_lower_case: bool = False, args=None):
     tokenizer = AutoTokenizer.from_pretrained(model_name, do_lower_case=do_lower_case)
     model = AutoModelWithLMHead.from_pretrained(model_name)
 
-    # uncomment for using data parallel
-#    special_tokens = ["[shuffled]", "[orig]", "<eos>"]
-#    extra_specials = [f"<S{i}>" for i in range(args.max_output_length)]
-#    special_tokens += extra_specials
-#    tokenizer.pad_token = "<pad>"
-#    tokenizer.eos_token = "<eos>"
-#    tokenizer.add_tokens(special_tokens)
-#
-#    model.resize_token_embeddings(len(tokenizer))
-#    model = nn.DataParallel(model, device_ids = [1, 2])
+     # uncomment for using data parallel
+    special_tokens = ["[shuffled]", "[orig]", "<eos>"]
+    extra_specials = [f"<S{i}>" for i in range(args.max_output_length)]
+    special_tokens += extra_specials
+    tokenizer.pad_token = "<pad>"
+    tokenizer.eos_token = "<eos>"
+    tokenizer.add_tokens(special_tokens)
+
+    model.resize_token_embeddings(len(tokenizer))
+    model = nn.DataParallel(model)
     model.to(device)
     model.eval()
     return tokenizer, model
 
 
 ### Reordering task
+
 def load_data(in_file, task="in_shuf"):
     """
     Loads the dataset file:
